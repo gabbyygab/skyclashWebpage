@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import heroBg from './assets/image.png'
 import poster from './assets/POSTER(with names).png'
 
@@ -47,11 +47,23 @@ const CHARACTERS = [
   { name: 'Zeus', role: 'Thunder God', color: 'from-gold-500 to-gold-600', accent: 'bg-gold-500' },
   { name: 'Poseidon', role: 'Sea Lord', color: 'from-teal-400 to-teal-600', accent: 'bg-teal-400' },
   { name: 'Athena', role: 'War Goddess', color: 'from-ember-400 to-ember-600', accent: 'bg-ember-400' },
-  { name: 'Hades', role: 'Shadow King', color: 'from-mystic-500 to-mystic-600', accent: 'bg-mystic-500' },
+  { name: 'Ares', role: 'God of War', color: 'from-red-600 to-red-800', accent: 'bg-red-600' },
+  { name: 'Hephaestus', role: 'Forge Master', color: 'from-orange-500 to-orange-700', accent: 'bg-orange-500' },
 ]
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [downloadCount, setDownloadCount] = useState(null)
+
+  useEffect(() => {
+    fetch('https://api.github.com/repos/gabbyygab/skyclashGwen/releases/tags/v1.0.0.0')
+      .then((r) => r.json())
+      .then((data) => {
+        const apk = data.assets?.find((a) => a.name.endsWith('.apk'))
+        if (apk) setDownloadCount(apk.download_count)
+      })
+      .catch(() => {})
+  }, [])
 
   return (
     <div className="min-h-screen bg-stars">
@@ -247,11 +259,11 @@ function App() {
               Choose your champion and master their unique combat style. More fighters coming soon.
             </p>
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+          <div className="flex flex-wrap justify-center gap-3 sm:gap-6">
             {CHARACTERS.map((c) => (
               <div
                 key={c.name}
-                className="card-glow bg-navy-800/60 border border-navy-700/50 rounded-2xl overflow-hidden hover:border-gold-500/40 transition-all group hover:-translate-y-1"
+                className="card-glow w-[calc(50%-6px)] lg:w-[calc(25%-18px)] bg-navy-800/60 border border-navy-700/50 rounded-2xl overflow-hidden hover:border-gold-500/40 transition-all group hover:-translate-y-1"
               >
                 <div className={`h-36 sm:h-56 bg-gradient-to-br ${c.color} flex items-center justify-center relative`}>
                   <div className="absolute inset-0 bg-navy-950/30 group-hover:bg-navy-950/20 transition-colors" />
@@ -318,11 +330,11 @@ function App() {
           </h2>
           <p className="text-gray-300 mt-4 max-w-xl mx-auto text-base sm:text-lg">
             Download SkyClash: Arena of Legends and prove your worth in the Aether Heights.
-            Available on PC and Android.
+            Available on Android.
           </p>
-          <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+          <div className="mt-8 sm:mt-10 flex justify-center">
             <a
-              href="#"
+              href="https://github.com/gabbyygab/skyclashGwen/releases/download/v1.0.0.0/SkyClashArena.apk"
               className="animate-pulse-glow bg-gold-500 hover:bg-gold-600 text-navy-950 font-bold text-base sm:text-lg px-8 sm:px-10 py-3 sm:py-4 rounded-xl transition-all hover:scale-105 inline-flex items-center justify-center gap-3"
             >
               <svg className="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="currentColor">
@@ -330,15 +342,19 @@ function App() {
               </svg>
               Download APK
             </a>
-            <a
-              href="#"
-              className="border-2 border-teal-400 text-teal-400 hover:bg-teal-400/10 font-bold text-base sm:text-lg px-8 sm:px-10 py-3 sm:py-4 rounded-xl transition-all hover:scale-105 inline-flex items-center justify-center gap-3"
-            >
-              <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-              Download for PC
-            </a>
+          </div>
+          <div className="mt-4 flex justify-center gap-6 text-sm text-gray-500">
+            <span>Version 1.0.0.0</span>
+            <span>&bull;</span>
+            <span>176 MB</span>
+            <span>&bull;</span>
+            <span>Android</span>
+            {downloadCount !== null && (
+              <>
+                <span>&bull;</span>
+                <span>{downloadCount.toLocaleString()} downloads</span>
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -357,7 +373,7 @@ function App() {
           </div>
         </div>
         <div className="max-w-7xl mx-auto mt-6 pt-6 border-t border-navy-800/60 text-center text-xs text-gray-600">
-          Built with Unity &bull; 2D Platform Fighter &bull; PC &amp; Android
+          Built with Unity &bull; 2D Platform Fighter &bull; Android
         </div>
       </footer>
     </div>
