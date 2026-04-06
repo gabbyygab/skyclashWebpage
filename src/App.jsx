@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import heroBg from './assets/image.png'
 import logo from './assets/LOGO.png'
 import poster from './assets/POSTER(with names).png'
@@ -286,6 +286,10 @@ function App() {
   const [copiedEmail, setCopiedEmail] = useState(null)
   const [copiedPhone, setCopiedPhone] = useState(null)
   const [showScrollTop, setShowScrollTop] = useState(false)
+  const [currentArenaIdx, setCurrentArenaIdx] = useState(0)
+  
+  const videoRef = useRef(null)
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -326,7 +330,7 @@ function App() {
   return (
     <div className="min-h-screen bg-stars">
       {/* Navbar */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-navy-950/90 backdrop-blur-lg border-b border-gold-500/15">
+      <nav className="fixed top-0 left-0 right-0 z-[100] bg-navy-950/90 backdrop-blur-lg border-b border-gold-500/15">
         <div className="max-w-6xl mx-auto px-6 sm:px-10 lg:px-16 flex items-center justify-between h-16">
           <a href="#home" className="flex items-center">
             <img src={logo} alt="SkyClash" className="h-10 sm:h-12 w-auto object-contain" />
@@ -448,19 +452,59 @@ function App() {
             <div className="w-16 h-1 bg-gradient-to-r from-teal-400 to-teal-600 mt-4 mx-auto rounded-full" />
           </div>
           
-          <div className="relative group mx-auto aspect-video rounded-2xl md:rounded-[2rem] overflow-hidden shadow-2xl shadow-navy-950/80 border border-navy-700/50 bg-navy-900 flex items-center justify-center transition-all hover:border-gold-500/40">
-            <div className="absolute -inset-4 bg-gradient-to-r from-gold-500/10 via-transparent to-teal-400/10 blur-xl opacity-50 group-hover:opacity-100 transition-opacity" />
+          <div 
+            className={`relative group mx-auto aspect-video rounded-2xl md:rounded-[2rem] overflow-hidden shadow-2xl border bg-navy-900 flex items-center justify-center transition-all duration-500
+              ${isVideoPlaying ? 'border-teal-500/30 shadow-[0_0_30px_rgba(45,212,191,0.15)]' : 'border-teal-400/50 shadow-[0_0_40px_rgba(45,212,191,0.3)] hover:border-gold-500/60'}`}
+          >
+            <div className={`absolute inset-0 bg-gradient-to-r from-teal-500/20 via-transparent to-teal-400/20 blur-2xl transition-opacity duration-700 pointer-events-none ${isVideoPlaying ? 'opacity-0' : 'opacity-100'}`} />
             
-            {/* Trailer Video Player */}
+            {/* Trailer Video Player Without Default Controls */}
             <video 
-              className="absolute inset-0 w-full h-full object-cover z-20 pointer-events-auto"
+              ref={videoRef}
+              className="absolute inset-0 w-full h-full object-cover z-10"
               src={trailerVideo} 
-              controls
               playsInline
               preload="metadata"
+              onPlay={() => setIsVideoPlaying(true)}
+              onPause={() => setIsVideoPlaying(false)}
+              onEnded={() => setIsVideoPlaying(false)}
+              onClick={() => {
+                if (videoRef.current) {
+                  if (isVideoPlaying) videoRef.current.pause();
+                  else videoRef.current.play();
+                }
+              }}
             >
               Your browser does not support the video tag.
             </video>
+
+            {/* Custom Play/Pause Overlay */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (videoRef.current) {
+                  if (isVideoPlaying) videoRef.current.pause();
+                  else videoRef.current.play();
+                }
+              }}
+              className={`absolute z-20 flex items-center justify-center rounded-full transition-all duration-300 ${
+                isVideoPlaying 
+                  ? 'opacity-0 group-hover:opacity-100 w-16 h-16 bg-navy-950/60 backdrop-blur-sm text-white hover:bg-navy-900/80 scale-90 hover:scale-100' 
+                  : 'w-24 h-24 bg-teal-500/90 text-navy-950 hover:bg-teal-400 shadow-[0_0_30px_rgba(45,212,191,0.6)] scale-100 hover:scale-110'
+              }`}
+              aria-label={isVideoPlaying ? "Pause trailer" : "Play trailer"}
+            >
+              {isVideoPlaying ? (
+                <svg className="w-8 h-8 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                  <rect x="6" y="4" width="4" height="16" />
+                  <rect x="14" y="4" width="4" height="16" />
+                </svg>
+              ) : (
+                <svg className="w-10 h-10 ml-2" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              )}
+            </button>
           </div>
         </div>
       </section>
@@ -558,19 +602,21 @@ function App() {
       {/* Characters */}
       <section id="characters" className="py-20 sm:py-28 px-6 sm:px-10 lg:px-16">
         <div className="max-w-6xl mx-auto">
+          
+          {/* Main Section Header */}
           <div className="text-center mb-10 sm:mb-12">
-            <h2 className="font-heading font-bold text-2xl sm:text-3xl md:text-4xl text-white">
+            <h2 className="font-heading font-bold text-3xl sm:text-4xl md:text-5xl text-white">
               Skybound <span className="text-gold-400">Champions</span>
             </h2>
             <div className="w-20 h-1 bg-gradient-to-r from-gold-500 to-gold-600 mt-4 mx-auto rounded-full" />
-            <p className="text-gray-400 mt-4 max-w-xl mx-auto text-sm sm:text-base">
+            <p className="text-gray-400 mt-4 max-w-xl mx-auto text-sm sm:text-base leading-relaxed">
               Six legendary heroes, each with a unique weapon, playstyle, and signature abilities. Choose your champion and master their combat style.
             </p>
           </div>
 
           {/* Large Character Preview */}
           {selectedChar && (
-            <div className="mb-10 max-w-4xl mx-auto bg-navy-800/40 border border-navy-700/50 rounded-3xl overflow-hidden flex flex-col md:flex-row shadow-2xl transition-all duration-300">
+            <div className="max-w-4xl mx-auto bg-navy-800/40 border border-navy-700/50 rounded-3xl overflow-hidden flex flex-col md:flex-row shadow-2xl transition-all duration-300">
               {/* Hero banner / Visual side */}
               <div className="md:w-1/3 min-h-[300px] relative overflow-hidden bg-navy-900 border-b md:border-b-0 md:border-r border-navy-700/50">
                 <img 
@@ -614,42 +660,44 @@ function App() {
             </div>
           )}
 
-          {/* Carousel Selector */}
-          <div className="relative">
-            <p className="text-center text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4">Select a Champion</p>
-            {/* Hiding scrollbar via custom CSS (assumed from global index.css or tailwind classes, using standard styling) */}
-            <div className="flex overflow-x-auto gap-4 pb-6 px-2 snap-x snap-mandatory scroll-smooth" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-              <style>{`.hide-scrollbar::-webkit-scrollbar { display: none; }`}</style>
-              <div className="hide-scrollbar absolute inset-0 pointer-events-none" />
-              {CHARACTERS.map((c) => {
-                const isActive = selectedChar?.name === c.name;
-                return (
-                  <div
-                    key={c.name}
-                    onClick={() => setSelectedChar(c)}
-                    className={`snap-center shrink-0 w-36 sm:w-44 card-glow bg-navy-800/60 border rounded-2xl overflow-hidden transition-all group cursor-pointer hover:-translate-y-2 ${isActive ? 'border-gold-500/80 ring-2 ring-gold-500/20 opacity-100 scale-100' : 'border-navy-700/50 opacity-70 hover:opacity-100 scale-95 hover:scale-100'}`}
-                  >
-                    {/* Color banner */}
-                    <div className={`h-28 sm:h-32 bg-gradient-to-br ${c.color} flex items-center justify-center relative overflow-hidden`}>
-                      <div className="absolute inset-0 bg-navy-950/40 group-hover:bg-navy-950/20 transition-colors z-10 pointer-events-none" />
-                      <img 
-                        src={c.photo} 
-                        alt={c.name} 
-                        className={`absolute inset-0 w-full h-full object-cover object-top transition-transform duration-500 ${isActive ? 'scale-[1.35]' : 'scale-[1.25] group-hover:scale-[1.35]'}`} 
-                      />
-                    </div>
-                    {/* Info */}
-                    <div className="p-3 text-center relative">
-                      {isActive && <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-4 h-1 bg-gold-500 rounded-full" />}
-                      <h3 className={`font-heading font-bold text-sm sm:text-base transition-colors ${isActive ? 'text-gold-400' : 'text-white group-hover:text-gold-300'}`}>
-                        {c.name}
-                      </h3>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+
+          <div className="font-heading text-center text-[10px] sm:text-xs font-semibold text-gray-300 tracking-[0.2em] uppercase mb-6 sm:mb-8">
+            Select A Champion
           </div>
+
+          {/* Grid Selector matching Reference 2 */}
+          <div className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-4">
+            {CHARACTERS.map((c) => {
+              const isActive = selectedChar?.name === c.name;
+              return (
+                <div
+                  key={c.name}
+                  onClick={() => setSelectedChar(c)}
+                  className={`relative w-28 sm:w-32 md:w-36 lg:w-44 flex flex-col cursor-pointer transition-all duration-300 rounded-xl overflow-hidden border-2 ${isActive ? 'border-gold-500 shadow-[0_0_15px_rgba(212,164,74,0.4)] scale-[1.02] sm:scale-105 z-10' : 'border-navy-800 hover:border-navy-600 scale-100'}`}
+                >
+                  {/* Image container */}
+                  <div className={`relative aspect-square overflow-hidden bg-navy-950 border-b-2 ${isActive ? 'border-gold-500/50' : 'border-navy-800'}`}>
+                    <img 
+                      src={c.photo} 
+                      alt={c.name} 
+                      className={`absolute inset-0 w-full h-full object-cover object-top transition-all duration-500 ${isActive ? 'scale-110 brightness-100' : 'scale-100 brightness-[0.4] group-hover:brightness-[0.6]'}`} 
+                    />
+                    
+                    {/* Simulated Intricate Top Border glow from Reference Image */}
+                    <div className="absolute top-0 inset-x-0 h-3 bg-gradient-to-b from-navy-900/50 to-transparent pointer-events-none" />
+                  </div>
+                  
+                  {/* Bottom Text bar */}
+                  <div className={`py-4 sm:py-5 flex items-center justify-center transition-colors duration-300 ${isActive ? 'bg-[#060c18]' : 'bg-[#060b14]'}`}>
+                    <h3 className={`font-heading font-black text-[10px] sm:text-xs md:text-sm tracking-widest uppercase transition-colors ${isActive ? 'text-gold-400 drop-shadow-md' : 'text-[#7a889c]'}`}>
+                      {c.name}
+                    </h3>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
         </div>
       </section>
 
@@ -715,43 +763,109 @@ function App() {
       <section id="arenas" className="py-20 sm:py-28 px-6 sm:px-10 lg:px-16 bg-navy-950 relative border-t border-navy-800/60">
         <div className="absolute inset-0 bg-gradient-to-br from-gold-500/5 via-transparent to-teal-500/5 opacity-50" />
         <div className="relative max-w-6xl mx-auto">
-          <div className="text-center mb-12 sm:mb-16">
-            <h2 className="font-heading font-bold text-2xl sm:text-3xl md:text-4xl text-white">
-              Battle <span className="text-teal-400">Arenas</span>
+          <div className="text-center mb-6 sm:mb-8">
+            <h2 className="font-heading font-black text-3xl sm:text-4xl md:text-5xl text-[#d8eaef] tracking-widest uppercase">
+              Battle <span className="text-teal-400 drop-shadow-[0_0_8px_rgba(45,212,191,0.5)]">Arenas</span>
             </h2>
-            <div className="w-20 h-1 bg-gradient-to-r from-teal-400 to-teal-600 mt-4 mx-auto rounded-full" />
-            <p className="text-gray-400 mt-4 max-w-2xl mx-auto text-sm sm:text-base">
-              Fight across breathtaking environments in the sky realm. Each arena challenges your positioning and movement differently.
+            <div className="w-20 h-1 bg-gradient-to-r from-teal-400 to-teal-600 mt-4 sm:mt-5 mx-auto rounded-full" />
+            <p className="text-gray-400 mt-6 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed relative z-20">
+              We currently feature <strong className="text-gold-400 tracking-wider">6 UNIQUE BATTLE ARENAS</strong>. Fight across breathtaking environments in the sky realm. Each arena challenges your positioning and movement differently.
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-            {ARENAS.map((arena) => (
-              <div key={arena.id} className="relative group overflow-hidden rounded-2xl md:rounded-[2rem] aspect-[4/3] bg-navy-900 border border-navy-700/50 shadow-xl transition-all hover:-translate-y-2 hover:shadow-gold-500/20 hover:border-gold-500/30 flex items-center justify-center">
-                {arena.image ? (
-                  <img src={arena.image} alt={arena.name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                ) : (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-0 opacity-50 group-hover:opacity-100 transition-opacity">
-                    <svg className="w-12 h-12 text-navy-600 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <p className="text-gray-500 text-xs font-semibold tracking-widest uppercase">Placeholder Space</p>
-                    <p className="text-navy-700 text-[10px] mt-1 max-w-[120px]">Upload {arena.id} map image</p>
-                  </div>
-                )}
+          {/* Coverflow Carousel */}
+          <div className="relative w-full overflow-hidden py-4">
+            <div className="relative max-w-6xl mx-auto h-[400px] sm:h-[480px] md:h-[550px] flex items-center justify-center">
+              {ARENAS.map((arena, idx) => {
+                let offset = idx - currentArenaIdx;
+                if (offset > ARENAS.length / 2) offset -= ARENAS.length;
+                else if (offset < -ARENAS.length / 2) offset += ARENAS.length;
                 
-                {/* Overlay Text */}
-                <div className="absolute inset-0 bg-gradient-to-t from-navy-950 via-navy-950/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
-                <div className="absolute bottom-0 inset-x-0 p-6 sm:p-8 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                  <h3 className="font-heading font-bold text-xl sm:text-2xl text-white mb-2 group-hover:text-gold-400 transition-colors">
-                    {arena.name}
-                  </h3>
-                  <p className="text-gray-300 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100 leading-relaxed max-w-sm">
-                    {arena.desc}
-                  </p>
-                </div>
-              </div>
-            ))}
+                const absOffset = Math.abs(offset);
+                const isCenter = absOffset === 0;
+                const direction = offset < 0 ? -1 : 1;
+                
+                let style = {};
+                if (absOffset > 2) {
+                  style = {
+                    transform: `translateX(${direction * 150}%)`,
+                    opacity: 0,
+                    zIndex: 0,
+                    pointerEvents: 'none',
+                  };
+                } else {
+                  // Fixed size in perspective! 
+                  // Scale remains 1, shifted via X-axis exactly like user reference.
+                  const translateX = isCenter ? 0 : offset * 68; // 68% of the card width Translation
+                  
+                  style = {
+                    transform: `translateX(${translateX}%)`,
+                    zIndex: 50 - absOffset * 10,
+                    filter: isCenter ? 'brightness(1.05)' : `brightness(${1 - absOffset * 0.4})`,
+                    opacity: 1, // Side cards fully opaque (just darkened)
+                    pointerEvents: isCenter ? 'auto' : 'auto',
+                    cursor: isCenter ? 'default' : 'pointer',
+                  };
+                }
+
+                const activeGlow = isCenter 
+                  ? 'shadow-[0_25px_50px_-12px_rgba(212,164,74,0.35)] ring-1 ring-gold-500/50' 
+                  : 'shadow-2xl border border-[#162238]';
+
+                return (
+                  <div 
+                    key={arena.id} 
+                    onClick={() => setCurrentArenaIdx(idx)}
+                    className={`absolute w-[80%] sm:w-[65%] md:w-[50%] lg:w-[48%] h-auto max-w-[550px] rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] bg-[#070e17] flex flex-col ${activeGlow}`}
+                    style={style}
+                  >
+                    {/* The Image (Aspect ratio preserved, not clipped like a placeholder) */}
+                    <div className="w-full relative bg-black border-b border-[#162238]/50 overflow-hidden">
+                      {arena.image ? (
+                        <img src={arena.image} alt={arena.name} className="w-full h-auto object-contain block object-bottom" />
+                      ) : (
+                        <div className="w-full aspect-[16/9] flex items-center justify-center bg-navy-800">
+                          <span className="text-navy-600">No Image</span>
+                        </div>
+                      )}
+                      
+                      {/* Subtle top inner shadow for depth feeling */}
+                      {isCenter && <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-transparent pointer-events-none" />}
+                    </div>
+                    
+                    {/* Information Panel below image */}
+                    <div className="w-full px-5 sm:px-8 pt-5 pb-6 sm:pt-7 sm:pb-8 flex flex-col justify-center text-left bg-[#070e17]">
+                      <div className="flex flex-col gap-1 sm:gap-2 transition-all duration-700" style={{ transform: isCenter ? 'translateY(0)' : 'translateY(8px)' }}>
+                        <div className="flex items-center gap-2">
+                          <div className={`w-0.5 h-3 sm:h-4 transition-colors duration-700 ${isCenter ? 'bg-gold-400' : 'bg-gray-500'}`} />
+                          <span className={`text-[9px] sm:text-[11px] font-bold tracking-[0.2em] uppercase transition-colors duration-700 whitespace-nowrap ${isCenter ? 'text-gold-400' : 'text-gray-400'}`}>
+                            Arena {idx + 1}
+                          </span>
+                        </div>
+                        <h3 className={`font-heading font-black text-xl sm:text-2xl md:text-3xl lg:text-4xl tracking-wider uppercase transition-colors duration-700 whitespace-nowrap overflow-hidden text-ellipsis ${isCenter ? 'text-white drop-shadow-md' : 'text-[#aab5cc]'}`}>
+                          {arena.name}
+                        </h3>
+                        <p className={`text-[8px] sm:text-[10px] font-semibold tracking-[0.1em] uppercase transition-colors duration-700 overflow-hidden text-ellipsis whitespace-nowrap ${isCenter ? 'text-gray-400' : 'text-[#4b5b76]'}`}>
+                          {arena.desc}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Indicators */}
+            <div className="flex justify-center items-center gap-2 mt-4 sm:mt-8 relative z-50">
+              {ARENAS.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setCurrentArenaIdx(idx)}
+                  className={`h-1.5 rounded-[1px] transition-all duration-500 ${idx === currentArenaIdx ? 'w-8 sm:w-10 bg-gold-400 shadow-[0_0_10px_rgba(232,197,100,0.8)]' : 'w-3 sm:w-4 bg-navy-800 hover:bg-navy-600 border border-[#162238]'}`}
+                  aria-label={`Go to slide ${idx + 1}`}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </section>
