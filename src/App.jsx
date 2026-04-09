@@ -280,8 +280,7 @@ const MECHANICS = [
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false)
-  const [downloadCount, setDownloadCount] = useState(null)
-  const [apkUrl, setApkUrl] = useState(null)
+  const [releases, setReleases] = useState([])
   const [selectedChar, setSelectedChar] = useState(CHARACTERS[0])
   const [copiedEmail, setCopiedEmail] = useState(null)
   const [copiedPhone, setCopiedPhone] = useState(null)
@@ -300,13 +299,20 @@ function App() {
   }, [])
 
   useEffect(() => {
-    fetch('https://api.github.com/repos/gabbyygab/skyclashWebpage/releases/tags/v1.0.0.0')
+    fetch('https://api.github.com/repos/gabbyygab/skyclashWebpage/releases')
       .then((r) => r.json())
       .then((data) => {
-        const apk = data.assets?.find((a) => a.name.endsWith('.apk'))
-        if (apk) {
-          setDownloadCount(apk.download_count)
-          setApkUrl(apk.browser_download_url)
+        if (Array.isArray(data)) {
+          const processed = data.map(release => {
+            const apk = release.assets?.find((a) => a.name.endsWith('.apk'))
+            return {
+              tag: release.tag_name,
+              url: apk?.browser_download_url,
+              count: apk?.download_count || 0,
+              size: apk ? (apk.size / (1024 * 1024)).toFixed(0) + ' MB' : '176 MB'
+            }
+          }).filter(r => r.url)
+          setReleases(processed)
         }
       })
       .catch(() => {})
@@ -316,10 +322,10 @@ function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const handleDownload = () => {
-    if (!apkUrl) return
+  const handleDownload = (url) => {
+    if (!url) return
     const a = document.createElement('a')
-    a.href = apkUrl
+    a.href = url
     a.download = 'SkyClashArena.apk'
     a.style.display = 'none'
     document.body.appendChild(a)
@@ -885,29 +891,59 @@ function App() {
 
 
 
-          <div className="mt-8 sm:mt-10 flex justify-center">
-            <button
-              onClick={handleDownload}
-              disabled={!apkUrl}
-              className="animate-pulse-glow bg-gold-500 hover:bg-gold-600 disabled:opacity-50 disabled:cursor-not-allowed text-navy-950 font-bold text-base sm:text-lg px-8 sm:px-10 py-3 sm:py-4 rounded-xl transition-all hover:scale-105 inline-flex items-center justify-center gap-3"
-            >
-              <svg className="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M17.523 2.232l-1.986 3.45A7.963 7.963 0 0012 4.5a7.96 7.96 0 00-3.537.818L6.477 1.868a.398.398 0 00-.546-.146.401.401 0 00-.146.547l1.97 3.42A8.427 8.427 0 003.5 12.5h17a8.427 8.427 0 00-4.255-6.447l1.97-3.42a.398.398 0 00-.146-.547.398.398 0 00-.546.146zM8.5 10.5a1 1 0 110-2 1 1 0 010 2zm7 0a1 1 0 110-2 1 1 0 010 2zM3.5 13.5v7a1 1 0 001 1h1v3a1.5 1.5 0 003 0v-3h5v3a1.5 1.5 0 003 0v-3h1a1 1 0 001-1v-7h-15zm-2 0a1.5 1.5 0 013 0v5a1.5 1.5 0 01-3 0v-5zm19 0a1.5 1.5 0 013 0v5a1.5 1.5 0 01-3 0v-5z" />
-              </svg>
-              Download APK
-            </button>
-          </div>
-          <div className="mt-4 flex justify-center gap-6 text-sm text-gray-500">
-            <span>Version 1.0.0.0</span>
-            <span>&bull;</span>
-            <span>176 MB</span>
-            <span>&bull;</span>
-            <span>Android</span>
-            {downloadCount !== null && (
-              <>
-                <span>&bull;</span>
-                <span>{downloadCount.toLocaleString()} downloads</span>
-              </>
+          <div className="mt-8 sm:mt-10 flex flex-col items-center gap-8">
+            <div className="flex flex-col items-center gap-4 w-full">
+              <button
+                onClick={() => handleDownload(releases[0]?.url)}
+                disabled={releases.length === 0}
+                className="animate-pulse-glow bg-gold-500 hover:bg-gold-600 disabled:opacity-50 disabled:cursor-not-allowed text-navy-950 font-bold text-base sm:text-lg px-8 sm:px-10 py-3 sm:py-4 rounded-xl transition-all hover:scale-105 inline-flex items-center justify-center gap-3 shadow-lg shadow-gold-500/25"
+              >
+                <svg className="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17.523 2.232l-1.986 3.45A7.963 7.963 0 0012 4.5a7.96 7.96 0 00-3.537.818L6.477 1.868a.398.398 0 00-.546-.146.401.401 0 00-.146.547l1.97 3.42A8.427 8.427 0 003.5 12.5h17a8.427 8.427 0 00-4.255-6.447l1.97-3.42a.398.398 0 00-.146-.547.398.398 0 00-.546.146zM8.5 10.5a1 1 0 110-2 1 1 0 010 2zm7 0a1 1 0 110-2 1 1 0 010 2zM3.5 13.5v7a1 1 0 001 1h1v3a1.5 1.5 0 003 0v-3h5v3a1.5 1.5 0 003 0v-3h1a1 1 0 001-1v-7h-15zm-2 0a1.5 1.5 0 013 0v5a1.5 1.5 0 01-3 0v-5zm19 0a1.5 1.5 0 013 0v5a1.5 1.5 0 01-3 0v-5z" />
+                </svg>
+                Download Latest ({releases[0]?.tag || 'v1.0.0.3'})
+              </button>
+              
+              {releases[0] && (
+                <div className="flex justify-center gap-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <span>{releases[0].size}</span>
+                  <span>&bull;</span>
+                  <span>Android</span>
+                  <span>&bull;</span>
+                  <span>{releases[0].count.toLocaleString()} downloads</span>
+                </div>
+              )}
+            </div>
+
+            {releases.length > 1 && (
+              <div className="w-full max-w-xl">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="flex-1 h-px bg-white/5" />
+                  <span className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">Other Versions</span>
+                  <div className="flex-1 h-px bg-white/5" />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {releases.slice(1).map((rel) => (
+                    <button
+                      key={rel.tag}
+                      onClick={() => handleDownload(rel.url)}
+                      className="flex items-center justify-between px-5 py-3 rounded-xl bg-navy-800/30 border border-navy-700/30 hover:border-gold-500/40 hover:bg-navy-800/50 transition-all group"
+                    >
+                      <div className="flex flex-col items-start translate-x-0 group-hover:translate-x-1 transition-transform">
+                        <span className="text-sm font-bold text-white uppercase tracking-tight">Version {rel.tag.replace('v', '')}</span>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <span className="text-[10px] text-gray-500">{rel.size}</span>
+                          <span className="text-[10px] text-gray-600">&bull;</span>
+                          <span className="text-[10px] text-gray-500">{rel.count.toLocaleString()} downloads</span>
+                        </div>
+                      </div>
+                      <svg className="w-4 h-4 text-gray-500 group-hover:text-gold-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M7 10l5 5m0 0l5-5m-5 5V3" />
+                      </svg>
+                    </button>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
         </div>
