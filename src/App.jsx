@@ -629,9 +629,9 @@ function App() {
           </Reveal>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             {FEATURES.map((f, i) => (
-              <Reveal key={f.title} delay={i * 90}>
+              <Reveal key={f.title} delay={i * 90} className="h-full flex flex-col">
               <div
-                className="card-glow bg-navy-800/60 border border-navy-700/50 rounded-2xl p-5 sm:p-6 hover:border-gold-500/40 transition-all group hover:-translate-y-1"
+                className="card-glow bg-navy-800/60 border border-navy-700/50 rounded-2xl p-5 sm:p-6 hover:border-gold-500/40 transition-all group hover:-translate-y-1 flex-1 flex flex-col"
               >
                 <span className="text-3xl sm:text-4xl mb-3 sm:mb-4 block">{f.icon}</span>
                 <h3 className="font-heading font-bold text-base sm:text-lg text-white group-hover:text-gold-400 transition-colors">
@@ -781,8 +781,8 @@ function App() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 mb-16">
             {MECHANICS.map((m, i) => (
-              <Reveal key={m.num} delay={i * 80}>
-              <div className="bg-navy-800/40 border border-navy-700/30 rounded-2xl p-5 sm:p-6 hover:border-teal-400/30 transition-all group">
+              <Reveal key={m.num} delay={i * 80} className="h-full flex flex-col">
+              <div className="bg-navy-800/40 border border-navy-700/30 rounded-2xl p-5 sm:p-6 hover:border-teal-400/30 transition-all group flex-1 flex flex-col">
                 <div className="flex items-start gap-4">
                   <div>
                     <span className="font-heading text-3xl font-black text-gold-500/25 group-hover:text-gold-500/40 transition-colors leading-none block">{m.num}</span>
@@ -1081,9 +1081,9 @@ function App() {
           {/* Developer Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
             {DEVELOPERS.map((dev, i) => (
-              <Reveal key={dev.id} delay={i * 130}>
+              <Reveal key={dev.id} delay={i * 130} className="h-full flex flex-col">
               <div
-                className={`card-glow bg-navy-800/60 border ${dev.border} rounded-2xl overflow-hidden transition-all group hover:-translate-y-2 flex flex-col`}
+                className={`card-glow bg-navy-800/60 border ${dev.border} rounded-2xl overflow-hidden transition-all group hover:-translate-y-2 flex flex-col flex-1`}
               >
                 {/* Photo area */}
                 <div className="relative w-full aspect-square flex items-center justify-center overflow-hidden"
@@ -1186,7 +1186,7 @@ function App() {
           <div className="text-center md:text-right text-xs sm:text-sm text-gray-500 space-y-1">
             <p>Game Leader &amp; Programmer: <span className="text-gray-400">Al Christian Francisco</span></p>
             <p>Graphic Designer &amp; Asst. Programmer: <span className="text-gray-400">Stephanie Gwen Padel</span></p>
-            <p>Researcher: <span className="text-gray-400">John Michael Carlos</span></p>
+            <p>Audio Designer: <span className="text-gray-400">John Michael Carlos</span></p>
           </div>
         </div>
         <div className="max-w-6xl mx-auto mt-6 pt-6 border-t border-navy-800/60 text-center text-xs text-gray-600">
