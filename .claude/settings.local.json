@@ -4,7 +4,8 @@
       "Bash(npm run:*)",
       "Bash(gh release:*)",
       "Bash(gh api:*)",
-      "WebFetch(domain:api.github.com)"
+      "WebFetch(domain:api.github.com)",
+      "Bash(npx vite:*)"
     ]
   }
 }

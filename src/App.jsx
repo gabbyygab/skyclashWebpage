@@ -278,6 +278,40 @@ const MECHANICS = [
   },
 ]
 
+function Reveal({ children, direction = 'up', delay = 0, className = '' }) {
+  const ref = useRef(null)
+  const [inView, setInView] = useState(false)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting),
+      { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+  const transforms = {
+    up: 'translateY(48px)',
+    down: 'translateY(-48px)',
+    left: 'translateX(-60px)',
+    right: 'translateX(60px)',
+  }
+  return (
+    <div
+      ref={ref}
+      style={{
+        opacity: inView ? 1 : 0,
+        transform: inView ? 'none' : transforms[direction],
+        transition: `opacity 0.65s ease-out ${delay}ms, transform 0.65s ease-out ${delay}ms`,
+      }}
+      className={className}
+    >
+      {children}
+    </div>
+  )
+}
+
 function App() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [releases, setReleases] = useState([])
@@ -451,14 +485,17 @@ function App() {
       {/* Trailer */}
       <section id="trailer" className="py-20 sm:py-28 px-6 sm:px-10 lg:px-16 bg-navy-950 relative border-y border-navy-800/60">
         <div className="max-w-5xl mx-auto">
+          <Reveal>
           <div className="text-center mb-10 sm:mb-14">
             <h3 className="font-heading font-black text-3xl sm:text-4xl md:text-5xl text-white">
               Official <span className="text-teal-400">Trailer</span>
             </h3>
             <div className="w-16 h-1 bg-gradient-to-r from-teal-400 to-teal-600 mt-4 mx-auto rounded-full" />
           </div>
-          
-          <div 
+          </Reveal>
+
+          <Reveal delay={150}>
+          <div
             className={`relative group mx-auto aspect-video rounded-2xl md:rounded-[2rem] overflow-hidden shadow-2xl border bg-navy-900 flex items-center justify-center transition-all duration-500
               ${isVideoPlaying ? 'border-teal-500/30 shadow-[0_0_30px_rgba(45,212,191,0.15)]' : 'border-teal-400/50 shadow-[0_0_40px_rgba(45,212,191,0.3)] hover:border-gold-500/60'}`}
           >
@@ -512,12 +549,14 @@ function App() {
               )}
             </button>
           </div>
+          </Reveal>
         </div>
       </section>
 
       {/* About */}
       <section id="about" className="py-20 sm:py-28 px-6 sm:px-10 lg:px-16">
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8 sm:gap-12 items-center">
+          <Reveal direction="left">
           <div>
             <h2 className="font-heading font-bold text-2xl sm:text-3xl md:text-4xl text-white">
               The <span className="text-gold-400">Legend</span> Awaits
@@ -554,6 +593,8 @@ function App() {
               ))}
             </div>
           </div>
+          </Reveal>
+          <Reveal direction="right" delay={100}>
           <div className="relative group">
             <div className="absolute -inset-3 sm:-inset-4 bg-gradient-to-r from-gold-500/20 to-teal-500/20 rounded-2xl blur-xl opacity-60 group-hover:opacity-100 transition-opacity" />
             <img
@@ -562,6 +603,7 @@ function App() {
               className="relative rounded-2xl shadow-2xl shadow-navy-950/50 w-full transition-transform group-hover:scale-[1.02]"
             />
           </div>
+          </Reveal>
         </div>
       </section>
 
@@ -574,6 +616,7 @@ function App() {
       <section id="features" className="py-20 sm:py-28 px-6 sm:px-10 lg:px-16 relative overflow-hidden">
         <div className="absolute inset-0 bg-navy-900/40" />
         <div className="relative max-w-6xl mx-auto">
+          <Reveal>
           <div className="text-center mb-12 sm:mb-16">
             <h2 className="font-heading font-bold text-2xl sm:text-3xl md:text-4xl text-white">
               Game <span className="text-teal-400">Features</span>
@@ -583,10 +626,11 @@ function App() {
               Everything that makes SkyClash: Arena of Legends a unique and competitive fighting experience.
             </p>
           </div>
+          </Reveal>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-            {FEATURES.map((f) => (
+            {FEATURES.map((f, i) => (
+              <Reveal key={f.title} delay={i * 90}>
               <div
-                key={f.title}
                 className="card-glow bg-navy-800/60 border border-navy-700/50 rounded-2xl p-5 sm:p-6 hover:border-gold-500/40 transition-all group hover:-translate-y-1"
               >
                 <span className="text-3xl sm:text-4xl mb-3 sm:mb-4 block">{f.icon}</span>
@@ -595,6 +639,7 @@ function App() {
                 </h3>
                 <p className="text-gray-400 mt-2 leading-relaxed text-sm sm:text-base">{f.desc}</p>
               </div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -610,6 +655,7 @@ function App() {
         <div className="max-w-6xl mx-auto">
           
           {/* Main Section Header */}
+          <Reveal>
           <div className="text-center mb-10 sm:mb-12">
             <h2 className="font-heading font-bold text-3xl sm:text-4xl md:text-5xl text-white">
               Skybound <span className="text-gold-400">Champions</span>
@@ -619,8 +665,10 @@ function App() {
               Six legendary heroes, each with a unique weapon, playstyle, and signature abilities. Choose your champion and master their combat style.
             </p>
           </div>
+          </Reveal>
 
           {/* Large Character Preview */}
+          <Reveal delay={100}>
           {selectedChar && (
             <div className="max-w-4xl mx-auto bg-navy-800/40 border border-navy-700/50 rounded-3xl overflow-hidden flex flex-col md:flex-row shadow-2xl transition-all duration-300">
               {/* Hero banner / Visual side */}
@@ -665,8 +713,10 @@ function App() {
               </div>
             </div>
           )}
+          </Reveal>
 
 
+          <Reveal delay={200}>
           <div className="font-heading text-center text-[10px] sm:text-xs font-semibold text-gray-300 tracking-[0.2em] uppercase mb-6 sm:mb-8">
             Select A Champion
           </div>
@@ -703,6 +753,7 @@ function App() {
               );
             })}
           </div>
+          </Reveal>
 
         </div>
       </section>
@@ -716,6 +767,7 @@ function App() {
       <section id="gameplay" className="py-20 sm:py-28 px-6 sm:px-10 lg:px-16 relative overflow-hidden">
         <div className="absolute inset-0 bg-navy-900/40" />
         <div className="relative max-w-6xl mx-auto">
+          <Reveal>
           <div className="text-center mb-12 sm:mb-16">
             <h2 className="font-heading font-bold text-2xl sm:text-3xl md:text-4xl text-white">
               Gameplay <span className="text-teal-400">Mechanics</span>
@@ -725,10 +777,12 @@ function App() {
               Master every system to outplay your opponent and claim victory in the Aether Heights.
             </p>
           </div>
+          </Reveal>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 mb-16">
-            {MECHANICS.map((m) => (
-              <div key={m.num} className="bg-navy-800/40 border border-navy-700/30 rounded-2xl p-5 sm:p-6 hover:border-teal-400/30 transition-all group">
+            {MECHANICS.map((m, i) => (
+              <Reveal key={m.num} delay={i * 80}>
+              <div className="bg-navy-800/40 border border-navy-700/30 rounded-2xl p-5 sm:p-6 hover:border-teal-400/30 transition-all group">
                 <div className="flex items-start gap-4">
                   <div>
                     <span className="font-heading text-3xl font-black text-gold-500/25 group-hover:text-gold-500/40 transition-colors leading-none block">{m.num}</span>
@@ -740,10 +794,12 @@ function App() {
                   </div>
                 </div>
               </div>
+              </Reveal>
             ))}
           </div>
 
           {/* How to Win */}
+          <Reveal delay={100}>
           <div className="bg-navy-800/30 border border-gold-500/20 rounded-2xl p-6 sm:p-10">
             <h3 className="font-heading font-bold text-xl sm:text-2xl text-white text-center mb-8">
               How to <span className="text-gold-400">Win</span>
@@ -762,6 +818,7 @@ function App() {
               ))}
             </div>
           </div>
+          </Reveal>
         </div>
       </section>
 
@@ -769,6 +826,7 @@ function App() {
       <section id="arenas" className="py-20 sm:py-28 px-6 sm:px-10 lg:px-16 bg-navy-950 relative border-t border-navy-800/60">
         <div className="absolute inset-0 bg-gradient-to-br from-gold-500/5 via-transparent to-teal-500/5 opacity-50" />
         <div className="relative max-w-6xl mx-auto">
+          <Reveal>
           <div className="text-center mb-6 sm:mb-8">
             <h2 className="font-heading font-black text-3xl sm:text-4xl md:text-5xl text-[#d8eaef] tracking-widest uppercase">
               Battle <span className="text-teal-400 drop-shadow-[0_0_8px_rgba(45,212,191,0.5)]">Arenas</span>
@@ -778,82 +836,100 @@ function App() {
               We currently feature <strong className="text-gold-400 tracking-wider">6 UNIQUE BATTLE ARENAS</strong>. Fight across breathtaking environments in the sky realm. Each arena challenges your positioning and movement differently.
             </p>
           </div>
+          </Reveal>
           
-          {/* Coverflow Carousel */}
-          <div className="relative w-full overflow-hidden py-4">
-            <div className="relative max-w-6xl mx-auto h-[400px] sm:h-[480px] md:h-[550px] flex items-center justify-center">
+          {/* 3D Fan Carousel */}
+          <Reveal delay={150}>
+          <div className="relative w-full py-6 sm:py-10">
+            {/* Perspective stage */}
+            <div
+              className="relative mx-auto flex items-center justify-center"
+              style={{ perspective: '1800px', perspectiveOrigin: '50% 55%', height: 'clamp(260px, 38vw, 580px)' }}
+            >
               {ARENAS.map((arena, idx) => {
+                // Circular: wrap offset so it always takes the shortest path
                 let offset = idx - currentArenaIdx;
                 if (offset > ARENAS.length / 2) offset -= ARENAS.length;
                 else if (offset < -ARENAS.length / 2) offset += ARENAS.length;
-                
                 const absOffset = Math.abs(offset);
-                const isCenter = absOffset === 0;
-                const direction = offset < 0 ? -1 : 1;
-                
-                let style = {};
-                if (absOffset > 2) {
-                  style = {
-                    transform: `translateX(${direction * 150}%)`,
-                    opacity: 0,
-                    zIndex: 0,
-                    pointerEvents: 'none',
-                  };
-                } else {
-                  // Fixed size in perspective! 
-                  // Scale remains 1, shifted via X-axis exactly like user reference.
-                  const translateX = isCenter ? 0 : offset * 68; // 68% of the card width Translation
-                  
-                  style = {
-                    transform: `translateX(${translateX}%)`,
-                    zIndex: 50 - absOffset * 10,
-                    filter: isCenter ? 'brightness(1.05)' : `brightness(${1 - absOffset * 0.4})`,
-                    opacity: 1, // Side cards fully opaque (just darkened)
-                    pointerEvents: isCenter ? 'auto' : 'auto',
-                    cursor: isCenter ? 'default' : 'pointer',
-                  };
-                }
+                const dir = offset < 0 ? -1 : 1;
 
-                const activeGlow = isCenter 
-                  ? 'shadow-[0_25px_50px_-12px_rgba(212,164,74,0.35)] ring-1 ring-gold-500/50' 
-                  : 'shadow-2xl border border-[#162238]';
+                if (absOffset > 2) return null;
+
+                // Flat spread — no rotateY, cards stay upright
+                const fan = [
+                  { tx: '0vw',  scale: 1,    brightness: 1,    opacity: 1    },
+                  { tx: '48vw', scale: 0.78,  brightness: 0.50, opacity: 1    },
+                  { tx: '88vw', scale: 0.60,  brightness: 0.28, opacity: 0.85 },
+                ];
+
+                const c = fan[absOffset];
+                const isCenter = absOffset === 0;
 
                 return (
-                  <div 
-                    key={arena.id} 
-                    onClick={() => setCurrentArenaIdx(idx)}
-                    className={`absolute w-[80%] sm:w-[65%] md:w-[50%] lg:w-[48%] h-auto max-w-[550px] rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] bg-[#070e17] flex flex-col ${activeGlow}`}
-                    style={style}
+                  <div
+                    key={arena.id}
+                    onClick={() => !isCenter && setCurrentArenaIdx(idx)}
+                    style={{
+                      position: 'absolute',
+                      transform: `translateX(calc(${dir} * ${c.tx})) scale(${c.scale})`,
+                      opacity: c.opacity,
+                      zIndex: 20 - absOffset * 4,
+                      filter: `brightness(${c.brightness})`,
+                      transition: 'all 0.75s cubic-bezier(0.25, 1, 0.5, 1)',
+                      cursor: isCenter ? 'default' : 'pointer',
+                      width: 'min(66vw, 920px)',
+                    }}
+                    className="select-none"
                   >
-                    {/* The Image (Aspect ratio preserved, not clipped like a placeholder) */}
-                    <div className="w-full relative bg-black border-b border-[#162238]/50 overflow-hidden">
-                      {arena.image ? (
-                        <img src={arena.image} alt={arena.name} className="w-full h-auto object-contain block object-bottom" />
-                      ) : (
-                        <div className="w-full aspect-[16/9] flex items-center justify-center bg-navy-800">
-                          <span className="text-navy-600">No Image</span>
-                        </div>
+                    {/* Card shell */}
+                    <div
+                      className="relative rounded-2xl overflow-hidden"
+                      style={{
+                        boxShadow: isCenter
+                          ? '0 0 0 2px rgba(212,164,74,0.75), 0 40px 80px rgba(0,0,0,0.8), 0 0 60px rgba(212,164,74,0.3)'
+                          : '0 0 0 1px rgba(255,255,255,0.08), 0 20px 40px rgba(0,0,0,0.5)',
+                      }}
+                    >
+                      {/* Corner ornaments — visible only on active card */}
+                      {isCenter && (
+                        <>
+                          <span className="absolute top-0 left-0 w-9 h-9 z-20 border-t-[3px] border-l-[3px] border-gold-400 rounded-tl-2xl pointer-events-none" />
+                          <span className="absolute top-0 right-0 w-9 h-9 z-20 border-t-[3px] border-r-[3px] border-gold-400 rounded-tr-2xl pointer-events-none" />
+                          <span className="absolute bottom-0 left-0 w-9 h-9 z-20 border-b-[3px] border-l-[3px] border-gold-400 rounded-bl-2xl pointer-events-none" />
+                          <span className="absolute bottom-0 right-0 w-9 h-9 z-20 border-b-[3px] border-r-[3px] border-gold-400 rounded-br-2xl pointer-events-none" />
+                        </>
                       )}
-                      
-                      {/* Subtle top inner shadow for depth feeling */}
-                      {isCenter && <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-transparent pointer-events-none" />}
-                    </div>
-                    
-                    {/* Information Panel below image */}
-                    <div className="w-full px-5 sm:px-8 pt-5 pb-6 sm:pt-7 sm:pb-8 flex flex-col justify-center text-left bg-[#070e17]">
-                      <div className="flex flex-col gap-1 sm:gap-2 transition-all duration-700" style={{ transform: isCenter ? 'translateY(0)' : 'translateY(8px)' }}>
-                        <div className="flex items-center gap-2">
-                          <div className={`w-0.5 h-3 sm:h-4 transition-colors duration-700 ${isCenter ? 'bg-gold-400' : 'bg-gray-500'}`} />
-                          <span className={`text-[9px] sm:text-[11px] font-bold tracking-[0.2em] uppercase transition-colors duration-700 whitespace-nowrap ${isCenter ? 'text-gold-400' : 'text-gray-400'}`}>
-                            Arena {idx + 1}
-                          </span>
+
+                      {/* Arena image — landscape */}
+                      <div className="w-full relative bg-navy-900" style={{ aspectRatio: '16/9' }}>
+                        {arena.image ? (
+                          <img
+                            src={arena.image}
+                            alt={arena.name}
+                            className="w-full h-full object-cover object-center block"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-navy-800">
+                            <span className="text-navy-600 text-xs">No Image</span>
+                          </div>
+                        )}
+
+                        {/* Bottom scrim */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent pointer-events-none" />
+
+                        {/* Card label + name */}
+                        <div className="absolute bottom-0 left-0 right-0 px-4 sm:px-6 pb-4 sm:pb-6 z-10">
+                          <div className="flex items-center gap-2 mb-1">
+                            <div className={`w-px h-4 ${isCenter ? 'bg-gold-400' : 'bg-gray-500'}`} />
+                            <span className={`text-[9px] sm:text-[11px] font-bold tracking-[0.22em] uppercase ${isCenter ? 'text-gold-400' : 'text-gray-500'}`}>
+                              Arena {idx + 1}
+                            </span>
+                          </div>
+                          <h3 className="text-white font-black text-lg sm:text-xl md:text-2xl uppercase tracking-wide leading-tight drop-shadow-lg">
+                            {arena.name}
+                          </h3>
                         </div>
-                        <h3 className={`font-heading font-black text-xl sm:text-2xl md:text-3xl lg:text-4xl tracking-wider uppercase transition-colors duration-700 whitespace-nowrap overflow-hidden text-ellipsis ${isCenter ? 'text-white drop-shadow-md' : 'text-[#aab5cc]'}`}>
-                          {arena.name}
-                        </h3>
-                        <p className={`text-[8px] sm:text-[10px] font-semibold tracking-[0.1em] uppercase transition-colors duration-700 overflow-hidden text-ellipsis whitespace-nowrap ${isCenter ? 'text-gray-400' : 'text-[#4b5b76]'}`}>
-                          {arena.desc}
-                        </p>
                       </div>
                     </div>
                   </div>
@@ -861,18 +937,48 @@ function App() {
               })}
             </div>
 
-            {/* Indicators */}
-            <div className="flex justify-center items-center gap-2 mt-4 sm:mt-8 relative z-50">
-              {ARENAS.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setCurrentArenaIdx(idx)}
-                  className={`h-1.5 rounded-[1px] transition-all duration-500 ${idx === currentArenaIdx ? 'w-8 sm:w-10 bg-gold-400 shadow-[0_0_10px_rgba(232,197,100,0.8)]' : 'w-3 sm:w-4 bg-navy-800 hover:bg-navy-600 border border-[#162238]'}`}
-                  aria-label={`Go to slide ${idx + 1}`}
-                />
-              ))}
+            {/* Active arena description */}
+            <div className="text-center px-4 mt-5 min-h-[2.5rem]">
+              <p className="text-gray-400 text-xs sm:text-sm max-w-md mx-auto leading-relaxed transition-all duration-500">
+                {ARENAS[currentArenaIdx]?.desc}
+              </p>
+            </div>
+
+            {/* Nav arrows + dot indicators */}
+            <div className="flex items-center justify-center gap-4 mt-5 sm:mt-6">
+              <button
+                onClick={() => setCurrentArenaIdx(i => (i - 1 + ARENAS.length) % ARENAS.length)}
+                className="w-9 h-9 flex items-center justify-center rounded-full border transition-all border-navy-700 bg-navy-900/60 text-gray-400 hover:text-gold-400 hover:border-gold-500/50"
+                aria-label="Previous arena"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+
+              <div className="flex items-center gap-2">
+                {ARENAS.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setCurrentArenaIdx(idx)}
+                    className={`h-1.5 rounded-[1px] transition-all duration-500 ${idx === currentArenaIdx ? 'w-8 sm:w-10 bg-gold-400 shadow-[0_0_10px_rgba(232,197,100,0.8)]' : 'w-3 sm:w-4 bg-navy-800 hover:bg-navy-600 border border-[#162238]'}`}
+                    aria-label={`Go to arena ${idx + 1}`}
+                  />
+                ))}
+              </div>
+
+              <button
+                onClick={() => setCurrentArenaIdx(i => (i + 1) % ARENAS.length)}
+                className="w-9 h-9 flex items-center justify-center rounded-full border transition-all border-navy-700 bg-navy-900/60 text-gray-400 hover:text-gold-400 hover:border-gold-500/50"
+                aria-label="Next arena"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
             </div>
           </div>
+          </Reveal>
         </div>
       </section>
 
@@ -880,6 +986,7 @@ function App() {
       <section id="download" className="py-20 sm:py-28 px-6 sm:px-10 lg:px-16 relative overflow-hidden min-h-[60vh] flex flex-col items-center justify-center">
         <div className="absolute inset-0 bg-gradient-to-b from-navy-950 via-navy-900/50 to-navy-950" />
         <div className="absolute inset-0 bg-gradient-to-r from-gold-500/5 via-transparent to-teal-400/5" />
+        <Reveal>
         <div className="relative max-w-3xl mx-auto w-full text-center">
           <h2 className="font-heading font-bold text-2xl sm:text-3xl md:text-4xl text-white">
             Ready to <span className="text-gold-400">Clash</span>?
@@ -947,6 +1054,7 @@ function App() {
             )}
           </div>
         </div>
+        </Reveal>
       </section>
 
       {/* Divider */}
@@ -958,6 +1066,7 @@ function App() {
       <section id="team" className="py-20 sm:py-28 px-6 sm:px-10 lg:px-16 relative overflow-hidden">
         <div className="absolute inset-0 bg-navy-900/40" />
         <div className="relative max-w-6xl mx-auto">
+          <Reveal>
           <div className="text-center mb-12 sm:mb-16">
             <h2 className="font-heading font-bold text-2xl sm:text-3xl md:text-4xl text-white">
               Meet the <span className="text-gold-400">Developers</span>
@@ -967,12 +1076,13 @@ function App() {
               The passionate team behind SkyClash: Arena of Legends. Reach out to us — we'd love to hear from you!
             </p>
           </div>
+          </Reveal>
 
           {/* Developer Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-            {DEVELOPERS.map((dev) => (
+            {DEVELOPERS.map((dev, i) => (
+              <Reveal key={dev.id} delay={i * 130}>
               <div
-                key={dev.id}
                 className={`card-glow bg-navy-800/60 border ${dev.border} rounded-2xl overflow-hidden transition-all group hover:-translate-y-2 flex flex-col`}
               >
                 {/* Photo area */}
@@ -1060,6 +1170,7 @@ function App() {
                   </div>
                 </div>
               </div>
+              </Reveal>
             ))}
           </div>
         </div>
