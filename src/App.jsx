@@ -24,6 +24,7 @@ const NAV_LINKS = [
   { label: 'Trailer', href: '#trailer' },
   { label: 'About', href: '#about' },
   { label: 'Features', href: '#features' },
+  { label: 'Mechanics', href: '#gameplay' },
   { label: 'Characters', href: '#characters' },
   { label: 'Arenas', href: '#arenas' },
   { label: 'Team', href: '#team' },
@@ -98,7 +99,7 @@ const FEATURES = [
   },
   {
     title: 'Power-Up System',
-    desc: 'Collect power-ups randomly appearing in the arena to fill your Powerbar. Once the bar reaches 50%, you can activate a powered-up state to significantly boost your damage output.',
+    desc: 'Collect 5 power-ups randomly appearing in the arena to fill your Powerbar. Once the bar reaches 100%, you can activate a powered-up state to significantly boost your damage output.',
     icon: <img src={iconPowerups} alt="Power-up Icon" className="w-12 h-12 scale-[3.5] origin-center object-contain inline-block drop-shadow-md brightness-150" />,
   },
   {
@@ -267,7 +268,7 @@ const MECHANICS = [
   {
     num: '05',
     title: 'Power-Up & Ultimate',
-    desc: 'Power-ups randomly appear in the arena. Collect three to charge your Ultimate Ability — a devastating skill that deals high damage and can turn the tide of battle.',
+    desc: 'Power-ups randomly appear in the arena. Collect 5 power-ups to fill your Powerbar to 100% and unleash your Ultimate Ability — a devastating skill that can turn the tide of battle.',
     icon: '⚡',
   },
   {
@@ -314,7 +315,14 @@ function Reveal({ children, direction = 'up', delay = 0, className = '' }) {
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false)
-  const [releases, setReleases] = useState([])
+  const [releases, setReleases] = useState([
+    {
+      tag: 'v1.0.0.4',
+      url: 'https://github.com/gabbyygab/skyclashWebpage/releases/download/v1.0.0.4/SkyClashArena-LATEST.apk',
+      count: 0,
+      size: '178 MB'
+    }
+  ])
   const [selectedChar, setSelectedChar] = useState(CHARACTERS[0])
   const [copiedEmail, setCopiedEmail] = useState(null)
   const [copiedPhone, setCopiedPhone] = useState(null)
@@ -807,7 +815,7 @@ function App() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
               {[
                 { step: '01', title: 'Attack', text: 'Use light, heavy, and aerial attacks to deal damage. Chain combos with hero abilities for maximum effect.' },
-                { step: '02', title: 'Strategize', text: 'Control power-ups, manage cooldowns, position wisely, and collect three power-ups to unleash your Ultimate Ability.' },
+                { step: '02', title: 'Strategize', text: 'Control power-ups, manage cooldowns, position wisely, and collect 5 power-ups to fill your Powerbar to 100% and unleash your Ultimate Ability.' },
                 { step: '03', title: 'Eliminate', text: 'Deplete your opponent\'s health to zero or knock them out of the arena to claim victory and earn the Arena Legend title.' },
               ].map((item) => (
                 <div key={item.step} className="text-center">
@@ -1008,7 +1016,7 @@ function App() {
                 <svg className="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M17.523 2.232l-1.986 3.45A7.963 7.963 0 0012 4.5a7.96 7.96 0 00-3.537.818L6.477 1.868a.398.398 0 00-.546-.146.401.401 0 00-.146.547l1.97 3.42A8.427 8.427 0 003.5 12.5h17a8.427 8.427 0 00-4.255-6.447l1.97-3.42a.398.398 0 00-.146-.547.398.398 0 00-.546.146zM8.5 10.5a1 1 0 110-2 1 1 0 010 2zm7 0a1 1 0 110-2 1 1 0 010 2zM3.5 13.5v7a1 1 0 001 1h1v3a1.5 1.5 0 003 0v-3h5v3a1.5 1.5 0 003 0v-3h1a1 1 0 001-1v-7h-15zm-2 0a1.5 1.5 0 013 0v5a1.5 1.5 0 01-3 0v-5zm19 0a1.5 1.5 0 013 0v5a1.5 1.5 0 01-3 0v-5z" />
                 </svg>
-                Download Latest ({releases[0]?.tag || 'v1.0.0.3'})
+                Download Latest ({releases[0]?.tag || 'v1.0.0.4'})
               </button>
               
               {releases[0] && (
