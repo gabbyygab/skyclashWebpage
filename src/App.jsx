@@ -368,7 +368,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-stars">
+    <div className="min-h-screen bg-stars overflow-x-hidden">
       {/* Navbar */}
       <nav className="fixed top-0 left-0 right-0 z-[100] bg-navy-950/90 backdrop-blur-lg border-b border-gold-500/15">
         <div className="max-w-6xl mx-auto px-6 sm:px-10 lg:px-16 flex items-center justify-between h-16">
@@ -483,7 +483,7 @@ function App() {
       </section>
 
       {/* Trailer */}
-      <section id="trailer" className="py-20 sm:py-28 px-6 sm:px-10 lg:px-16 bg-navy-950 relative border-y border-navy-800/60">
+      <section id="trailer" className="py-20 sm:py-28 px-6 sm:px-10 lg:px-16 bg-navy-950 relative border-y border-navy-800/60 overflow-hidden">
         <div className="max-w-5xl mx-auto">
           <Reveal>
           <div className="text-center mb-10 sm:mb-14">
@@ -554,7 +554,7 @@ function App() {
       </section>
 
       {/* About */}
-      <section id="about" className="py-20 sm:py-28 px-6 sm:px-10 lg:px-16">
+      <section id="about" className="py-20 sm:py-28 px-6 sm:px-10 lg:px-16 overflow-hidden">
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8 sm:gap-12 items-center">
           <Reveal direction="left">
           <div>
@@ -651,7 +651,7 @@ function App() {
       </div>
 
       {/* Characters */}
-      <section id="characters" className="py-20 sm:py-28 px-6 sm:px-10 lg:px-16">
+      <section id="characters" className="py-20 sm:py-28 px-6 sm:px-10 lg:px-16 overflow-hidden">
         <div className="max-w-6xl mx-auto">
           
           {/* Main Section Header */}
@@ -823,7 +823,7 @@ function App() {
       </section>
 
       {/* Arenas */}
-      <section id="arenas" className="py-20 sm:py-28 px-6 sm:px-10 lg:px-16 bg-navy-950 relative border-t border-navy-800/60">
+      <section id="arenas" className="py-20 sm:py-28 px-6 sm:px-10 lg:px-16 bg-navy-950 relative border-t border-navy-800/60 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-gold-500/5 via-transparent to-teal-500/5 opacity-50" />
         <div className="relative max-w-6xl mx-auto">
           <Reveal>
